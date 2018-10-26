@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Requests\StoreCompanyData;
+use App\Http\Requests\CompanyData;
 use App\Models\Company;
+use Storage;
+use File;
+use Session;
 
 class CompanyController extends Controller
 {
@@ -15,7 +18,9 @@ class CompanyController extends Controller
      */
     public function index()
     {
-        return view('companies.index');
+        $companies = Company::all();
+
+        return view('companies.index', compact('companies'));
     }
 
     /**
@@ -34,12 +39,22 @@ class CompanyController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreCompanyData $request)
+    public function store(CompanyData $request)
     {
         $data = $request->all();
-
-        // dd($data);
+        $image = $request->file('logo');
+        $input['imagename'] = time().'.'.$image->getClientOriginalExtension();
+        $destinationPath = storage_path('/app/public');
+        $image->move($destinationPath, $input['imagename']);
+        $data['logo'] = $input['imagename'];
         $company = Company::create($data);
+        if ($company) {
+            Session::flash('success', 'Company was successfully created.');
+        } else {
+            Session::flash('failed', 'Something went wrong');
+        }
+
+        return back()->with('success','Company was successfully created');
     }
 
     /**
@@ -84,6 +99,19 @@ class CompanyController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $company = Company::findOrFail($id);
+        $logo_path = public_path("/storage/".$company->logo);  // Value is not URL but directory file path
+        if(File::exists($logo_path)) {
+            File::delete($logo_path);
+        }
+        $delete = $company->delete();
+        if ($delete) {
+            Session::flash('success', 'Company was successfully deleted.');
+        } else {
+            Session::flash('failed', 'Something went wrong');
+        }
+
+
+        return back();
     }
 }
