@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\EmployeeRequest;
+use App\Models\Employee;
+use App\Models\Company;
+use Session;
 
 class EmployeeController extends Controller
 {
@@ -13,7 +17,10 @@ class EmployeeController extends Controller
      */
     public function index()
     {
-        //
+        $employees = Employee::with('company')->paginate(10);
+        $companies = Company::all();
+
+        return view('employees.index', compact('employees', 'companies'));
     }
 
     /**
@@ -32,9 +39,17 @@ class EmployeeController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(EmployeeRequest $request)
     {
-        //
+        $data = $request->all();
+        $employee = Employee::create($data);
+        if ($employee) {
+            Session::flash('success', 'Employee was successfully created.');
+        } else {
+            Session::flash('failed', 'Something went wrong');
+        }
+
+        return back();
     }
 
     /**
@@ -56,7 +71,11 @@ class EmployeeController extends Controller
      */
     public function edit($id)
     {
-        //
+        $companies = Company::all();
+        $employees = Employee::where('id', '!=', $id)->paginate(10);
+        $employee = Employee::findOrFail($id);
+
+        return view('employees.index', compact('companies', 'employees', 'employee'));
     }
 
     /**
@@ -66,9 +85,17 @@ class EmployeeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(EmployeeRequest $request, $id)
     {
-        //
+        $data = $request->except('_token', '_method', 'id');
+        $employee = Employee::where('id', $id)->update($data);
+        if ($employee) {
+            Session::flash('success', 'Employee was successfully updated.');
+        } else {
+            Session::flash('failed', 'Something went wrong');
+        }
+
+        return redirect()->action('EmployeeController@index');
     }
 
     /**
@@ -79,6 +106,14 @@ class EmployeeController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $employee = Employee::findOrFail($id);
+        $delete = $employee->delete();
+        if ($delete) {
+            Session::flash('success', 'Employee was successfully deleted.');
+        } else {
+            Session::flash('failed', 'Something went wrong');
+        }
+
+        return redirect()->action('EmployeeController@index');
     }
 }

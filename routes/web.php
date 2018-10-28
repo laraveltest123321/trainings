@@ -15,7 +15,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Auth::routes();
 // Authentication Routes...
 Route::get('login', [
   'as' => 'login',
@@ -48,7 +47,9 @@ Route::get('password/reset/{token}', [
   'uses' => 'Auth\ResetPasswordController@showResetForm'
 ]);
 
-Route::resource('/companies', 'CompanyController');
-Route::resource('/employees', 'EmployeeController');
-
-Route::get('/home', 'HomeController@index')->name('home');
+/* Protected Routes */
+Route::middleware(['auth'])->group(function() {
+    Route::get('/home', 'HomeController@index')->name('home');
+    Route::resource('/companies', 'CompanyController');
+    Route::resource('/employees', 'EmployeeController');
+});

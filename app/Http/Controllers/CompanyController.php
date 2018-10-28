@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Requests\CompanyData;
+use App\Http\Requests\CompanyRequest;
 use App\Models\Company;
 use Storage;
 use File;
@@ -18,7 +18,7 @@ class CompanyController extends Controller
      */
     public function index()
     {
-        $companies = Company::all();
+        $companies = Company::paginate(10);
 
         return view('companies.index', compact('companies'));
     }
@@ -39,7 +39,7 @@ class CompanyController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(CompanyData $request)
+    public function store(CompanyRequest $request)
     {
         $data = $request->all();
         $image = $request->file('logo');
@@ -54,7 +54,7 @@ class CompanyController extends Controller
             Session::flash('failed', 'Something went wrong');
         }
 
-        return back()->with('success','Company was successfully created');
+        return back();
     }
 
     /**
@@ -76,7 +76,10 @@ class CompanyController extends Controller
      */
     public function edit($id)
     {
-        //
+        $companies = Company::where('id', '!=', $id)->paginate(10);
+        $company = Company::findOrFail($id);
+
+        return view('companies.index', compact('companies', 'company'));
     }
 
     /**
@@ -86,9 +89,32 @@ class CompanyController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(CompanyRequest $request, $id)
     {
-        //
+        $company_old = Company::findOrFail($id);
+        $data = $request->except('_token', '_method', 'id');
+        $image = $request->file('logo');
+
+        if ($image) {
+            if($company_old->logo) {
+                $logo_path = public_path("/storage/".$company_old->logo);
+                if(File::exists($logo_path)) {
+                    File::delete($logo_path);
+                }
+            }
+            $input['imagename'] = time().'.'.$image->getClientOriginalExtension();
+            $destinationPath = storage_path('/app/public');
+            $image->move($destinationPath, $input['imagename']);
+            $data['logo'] = $input['imagename'];
+        }
+        $company = Company::where('id', $id)->update($data);
+        if ($company) {
+            Session::flash('success', 'Company was successfully updated.');
+        } else {
+            Session::flash('failed', 'Something went wrong');
+        }
+
+        return redirect()->action('CompanyController@index');
     }
 
     /**
@@ -100,7 +126,7 @@ class CompanyController extends Controller
     public function destroy($id)
     {
         $company = Company::findOrFail($id);
-        $logo_path = public_path("/storage/".$company->logo);  // Value is not URL but directory file path
+        $logo_path = public_path("/storage/".$company->logo);
         if(File::exists($logo_path)) {
             File::delete($logo_path);
         }
@@ -111,7 +137,6 @@ class CompanyController extends Controller
             Session::flash('failed', 'Something went wrong');
         }
 
-
-        return back();
+        return redirect()->action('CompanyController@index');
     }
 }
