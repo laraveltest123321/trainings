@@ -8,7 +8,7 @@ use App\Models\Employee;
 use App\Models\Company;
 use Session;
 
-class EmployeeController extends Controller
+class EmployeesController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,19 +18,20 @@ class EmployeeController extends Controller
     public function index()
     {
         $employees = Employee::with('company')->paginate(10);
-        $companies = Company::all();
 
         return view('employees.index', compact('employees', 'companies'));
     }
 
-    /**
+       /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
-        //
+        $companies = Company::all();
+
+        return view('employees.form', compact('companies'));
     }
 
     /**
@@ -43,24 +44,8 @@ class EmployeeController extends Controller
     {
         $data = $request->all();
         $employee = Employee::create($data);
-        if ($employee) {
-            Session::flash('success', 'Employee was successfully created.');
-        } else {
-            Session::flash('failed', 'Something went wrong');
-        }
 
-        return back();
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
+        return redirect()->route('employees.index')->with('success', 'Employee was successfully created.');
     }
 
     /**
@@ -75,7 +60,7 @@ class EmployeeController extends Controller
         $employees = Employee::where('id', '!=', $id)->paginate(10);
         $employee = Employee::findOrFail($id);
 
-        return view('employees.index', compact('companies', 'employees', 'employee'));
+        return view('employees.form', compact('companies', 'employees', 'employee'));
     }
 
     /**
@@ -89,13 +74,8 @@ class EmployeeController extends Controller
     {
         $data = $request->except('_token', '_method', 'id');
         $employee = Employee::where('id', $id)->update($data);
-        if ($employee) {
-            Session::flash('success', 'Employee was successfully updated.');
-        } else {
-            Session::flash('failed', 'Something went wrong');
-        }
 
-        return redirect()->action('EmployeeController@index');
+        return redirect()->route('employees.index')->with('success', 'Employee was successfully updated.');
     }
 
     /**
@@ -108,12 +88,7 @@ class EmployeeController extends Controller
     {
         $employee = Employee::findOrFail($id);
         $delete = $employee->delete();
-        if ($delete) {
-            Session::flash('success', 'Employee was successfully deleted.');
-        } else {
-            Session::flash('failed', 'Something went wrong');
-        }
 
-        return redirect()->action('EmployeeController@index');
+        return redirect()->route('employees.index')->with('success', 'Employee was successfully deleted.');
     }
 }

@@ -9,7 +9,7 @@ use Storage;
 use File;
 use Session;
 
-class CompanyController extends Controller
+class CompaniesController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -23,15 +23,16 @@ class CompanyController extends Controller
         return view('companies.index', compact('companies'));
     }
 
-    /**
+     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
-        //
+        return view('companies.form');
     }
+
 
     /**
      * Store a newly created resource in storage.
@@ -42,30 +43,16 @@ class CompanyController extends Controller
     public function store(CompanyRequest $request)
     {
         $data = $request->all();
-        $image = $request->file('logo');
-        $input['imagename'] = time().'.'.$image->getClientOriginalExtension();
-        $destinationPath = storage_path('/app/public');
-        $image->move($destinationPath, $input['imagename']);
-        $data['logo'] = $input['imagename'];
-        $company = Company::create($data);
-        if ($company) {
-            Session::flash('success', 'Company was successfully created.');
-        } else {
-            Session::flash('failed', 'Something went wrong');
+        if ($image = $request->file('logo')) {
+            $imagename = time().'.'.$image->getClientOriginalExtension();
+            $destinationPath = storage_path('/app/public');
+            $image->move($destinationPath, $imagename);
+            $data['logo'] = $imagename;
         }
 
-        return back();
-    }
+        $company = Company::create($data);
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
+        return redirect()->route('companies.index')->with('success', 'Company was successfully created.');
     }
 
     /**
@@ -76,10 +63,10 @@ class CompanyController extends Controller
      */
     public function edit($id)
     {
-        $companies = Company::where('id', '!=', $id)->paginate(10);
         $company = Company::findOrFail($id);
 
-        return view('companies.index', compact('companies', 'company'));
+        return view('companies.form', compact('company'));
+
     }
 
     /**
@@ -91,30 +78,25 @@ class CompanyController extends Controller
      */
     public function update(CompanyRequest $request, $id)
     {
-        $company_old = Company::findOrFail($id);
+        $company = Company::findOrFail($id);
         $data = $request->except('_token', '_method', 'id');
         $image = $request->file('logo');
 
         if ($image) {
-            if($company_old->logo) {
-                $logo_path = public_path("/storage/".$company_old->logo);
+            if($company->logo) {
+                $logo_path = public_path("/storage/".$company->logo);
                 if(File::exists($logo_path)) {
                     File::delete($logo_path);
                 }
             }
-            $input['imagename'] = time().'.'.$image->getClientOriginalExtension();
+            $imagename = time().'.'.$image->getClientOriginalExtension();
             $destinationPath = storage_path('/app/public');
-            $image->move($destinationPath, $input['imagename']);
-            $data['logo'] = $input['imagename'];
+            $image->move($destinationPath, $imagename);
+            $data['logo'] = $imagename;
         }
-        $company = Company::where('id', $id)->update($data);
-        if ($company) {
-            Session::flash('success', 'Company was successfully updated.');
-        } else {
-            Session::flash('failed', 'Something went wrong');
-        }
+        $company = $company->update($data);
 
-        return redirect()->action('CompanyController@index');
+        return redirect()->route('companies.index')->with('success', 'Company was successfully updated.');
     }
 
     /**
@@ -130,13 +112,8 @@ class CompanyController extends Controller
         if(File::exists($logo_path)) {
             File::delete($logo_path);
         }
-        $delete = $company->delete();
-        if ($delete) {
-            Session::flash('success', 'Company was successfully deleted.');
-        } else {
-            Session::flash('failed', 'Something went wrong');
-        }
+        $isDeleted = $company->delete();
 
-        return redirect()->action('CompanyController@index');
+        return redirect()->route('companies.index')->with('success', 'Company was successfully deleted.');
     }
 }

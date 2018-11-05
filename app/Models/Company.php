@@ -21,7 +21,8 @@ class Company extends Model
     ];
 
     /*Get all employees associated with the company*/
-    public function employees() {
+    public function employees()
+    {
         return $this->hasMany('App\Models\Employee', 'company_id', 'id');
     }
 }
