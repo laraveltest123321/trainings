@@ -13,7 +13,7 @@
                         <p class="alert {{ Session::get('alert-class', 'alert-danger') }}">{{ Session::get('failed') }}</p>
                     @endif
                     <p>
-                        <a href="/employees/create"><button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#form" aria-expanded="false">
+                        <a href="{{  url('/employees/create')  }}"><button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#form" aria-expanded="false">
                             <i class="fas fa-plus-circle mr-10"></i>Add
                         </button></a>
                     </p>

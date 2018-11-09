@@ -13,10 +13,12 @@
                         @endif
                     </div>
                     <div class="card-body">
+                    @include('alerts.alerts')
+                    @if(count($companies) > 0)
                         @if(isset($employee))
                             <form method="POST" action="{{ url('/employees/'.$employee->id) }}">
                             @csrf
-                            <input name="_method" type="hidden" value="PUT">
+                            @method('PUT')
                             <input name="id" type="hidden" value="{{ $employee->id }}">
 
                         @else
@@ -26,36 +28,37 @@
                             <div class="form-group">
                                 <label for="companySelect">Select the Company</label>
                                 <select class="form-control" id="companySelect" name="company_id">
-                                    @if($companies)
-                                        @foreach($companies as $company)
-                                            @if(isset($employee))
-                                                <option value="{{ $company->id }}" selected="<?= $company->id === $employee->company->id? 'selected':'' ?>">{{ $company->name }}</option>
-                                            @else
-                                                <option value="{{ $company->id }}">{{ $company->name }}</option>
-                                            @endif
-                                        @endforeach
-                                    @endif
+                                    @foreach($companies as $company)
+                                        @if(isset($employee))
+                                            <option value="{{ $company->id }}" selected="<?= $company->id === $employee->company->id? 'selected':'' ?>">{{ $company->name }}</option>
+                                        @else
+                                            <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                        @endif
+                                    @endforeach
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label for="first_name">Firstname</label>
-                                <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Enter firstname" value="<?= isset($employee) ? $employee->first_name : ''?>">
+                                <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Enter firstname" value="{!! old('name', isset($employee)?$employee->first_name:'') !!}">
                             </div>
                             <div class="form-group">
                                 <label for="last_name">Lastname</label>
-                                <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Enter lastname" value="<?= isset($employee) ? $employee->last_name : ''?>">
+                                <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Enter lastname" value="{!! old('name', isset($employee)?$employee->last_name:'') !!}">
                             </div>
                             <div class="form-group">
                                 <label for="email">Email address</label>
-                                <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Enter email" value="<?= isset($employee) ? $employee->email : ''?>">
+                                <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Enter email" value="{!! old('name', isset($employee)?$employee->email:'') !!}">
                                 <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
                             </div>
                             <div class="form-group">
                                 <label for="phone">Phone</label>
-                                <input type="text" class="form-control" id="phone" name="phone" placeholder="Enter phone number" value="<?= isset($employee) ? $employee->phone : ''?>">
+                                <input type="text" class="form-control" id="phone" name="phone" placeholder="Enter phone number"  value="{!! old('name', isset($employee)?$employee->phone:'') !!}">
                             </div>
                             <button type="submit" class="btn btn-primary">Submit</button>
                         </form>
+                        @else
+                        <p>Please create a company <a href="{{ url('/companies/create') }}">First --></a></p>
+                    @endif
                     </div>
                 </div>
             </div>

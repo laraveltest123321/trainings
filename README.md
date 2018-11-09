@@ -6,18 +6,20 @@
         sudo chgrp -R www-data storage bootstrap/cache
         sudo chmod -R ug+rwx storage bootstrap/cache
 4. setup application environment for the project
-    Run mv .env.example .env
+    Run cp .env.example .env
 5. Generate app. key
     Run php artisan key:generate
 6. Setup .env file configurations
 7. Run migrations and seeds
     php artisan migrate --seed
+8. To create the symbolic link to storage folder from public 
+   Run php artisan storage:link
 
-8. Add Nginx default virtual host configurations
+9. Add Nginx default virtual host configurations
     Run the following commands..
     sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/example.com
     sudo nano /etc/nginx/sites-available/example.com
-9. set configs to the file (
+10. set configs to the file (
     
 	server {
 		listen 80;
@@ -41,11 +43,11 @@
 		}
 	}
       )
-10. Set link to this file
+11. Set link to this file
 	Run sudo ln -s /etc/nginx/sites-available/example.com /etc/nginx/sites-enabled/
-11. Reload Nginx
+12. Reload Nginx
         sudo systemctl reload nginx
-12. Add hostname to hosts file (etc/hosts)
+13. Add hostname to hosts file (etc/hosts)
 	127.0.0.1 example.com
 
 

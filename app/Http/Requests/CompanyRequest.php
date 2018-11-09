@@ -25,9 +25,9 @@ class CompanyRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'email' => 'unique:companies,email,'.$this->id,
-            'website' => 'max:255',
-            'logo' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'email' => 'required|unique:companies,email,'.$this->id,
+            'website' => 'required|max:255',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ];
     }
 }

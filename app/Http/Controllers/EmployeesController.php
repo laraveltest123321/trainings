@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Http\Requests\EmployeeRequest;
 use App\Models\Employee;
 use App\Models\Company;
-use Session;
 
 class EmployeesController extends Controller
 {
@@ -19,7 +17,7 @@ class EmployeesController extends Controller
     {
         $employees = Employee::with('company')->paginate(10);
 
-        return view('employees.index', compact('employees', 'companies'));
+        return view('employees.index', compact('employees'));
     }
 
        /**
@@ -42,8 +40,8 @@ class EmployeesController extends Controller
      */
     public function store(EmployeeRequest $request)
     {
-        $data = $request->all();
-        $employee = Employee::create($data);
+        $data = $request->only(['company_id', 'first_name', 'last_name', 'email', 'phone']);
+        Employee::create($data);
 
         return redirect()->route('employees.index')->with('success', 'Employee was successfully created.');
     }
@@ -72,8 +70,8 @@ class EmployeesController extends Controller
      */
     public function update(EmployeeRequest $request, $id)
     {
-        $data = $request->except('_token', '_method', 'id');
-        $employee = Employee::where('id', $id)->update($data);
+        $data = $request->only(['company_id', 'first_name', 'last_name', 'email', 'phone']);
+        Employee::where('id', $id)->update($data);
 
         return redirect()->route('employees.index')->with('success', 'Employee was successfully updated.');
     }
@@ -87,7 +85,7 @@ class EmployeesController extends Controller
     public function destroy($id)
     {
         $employee = Employee::findOrFail($id);
-        $delete = $employee->delete();
+        $employee->delete();
 
         return redirect()->route('employees.index')->with('success', 'Employee was successfully deleted.');
     }

@@ -2,12 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Http\Requests\CompanyRequest;
 use App\Models\Company;
-use Storage;
 use File;
-use Session;
 
 class CompaniesController extends Controller
 {
@@ -42,15 +39,14 @@ class CompaniesController extends Controller
      */
     public function store(CompanyRequest $request)
     {
-        $data = $request->all();
+        $data = $request->only(['name', 'email', 'website']);
         if ($image = $request->file('logo')) {
             $imagename = time().'.'.$image->getClientOriginalExtension();
             $destinationPath = storage_path('/app/public');
             $image->move($destinationPath, $imagename);
             $data['logo'] = $imagename;
         }
-
-        $company = Company::create($data);
+        Company::create($data);
 
         return redirect()->route('companies.index')->with('success', 'Company was successfully created.');
     }
@@ -79,7 +75,8 @@ class CompaniesController extends Controller
     public function update(CompanyRequest $request, $id)
     {
         $company = Company::findOrFail($id);
-        $data = $request->except('_token', '_method', 'id');
+        $data = $request->only(['name', 'email', 'website']);
+
         $image = $request->file('logo');
 
         if ($image) {
@@ -94,7 +91,7 @@ class CompaniesController extends Controller
             $image->move($destinationPath, $imagename);
             $data['logo'] = $imagename;
         }
-        $company = $company->update($data);
+        $company->update($data);
 
         return redirect()->route('companies.index')->with('success', 'Company was successfully updated.');
     }
@@ -108,11 +105,11 @@ class CompaniesController extends Controller
     public function destroy($id)
     {
         $company = Company::findOrFail($id);
-        $logo_path = public_path("/storage/".$company->logo);
-        if(File::exists($logo_path)) {
-            File::delete($logo_path);
+        $logoPath = public_path("/storage/".$company->logo);
+        if(File::exists($logoPath)) {
+            File::delete($logoPath);
         }
-        $isDeleted = $company->delete();
+        $company->delete();
 
         return redirect()->route('companies.index')->with('success', 'Company was successfully deleted.');
     }
