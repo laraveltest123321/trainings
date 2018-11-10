@@ -25,17 +25,17 @@
                         @endif
                             <div class="form-group">
                                 <label for="name">Name</label>
-                                <input type="text" class="form-control" id="name" name="name" placeholder="Enter name" value="{!! old('name', isset($company)?$company->name:'') !!}">
+                                <input type="text" class="form-control" id="name" name="name" placeholder="Enter name" value="{!! old('name', isset($company) ? $company->name : '') !!}">
                             </div>
                             <div class="form-group">
                                 <label for="email">Email address</label>
-                                <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Enter email" value="{!! old('email', isset($company)?$company->email:'') !!}">
+                                <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Enter email" value="{!! old('email', isset($company) ? $company->email : '') !!}">
                                 <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
                             </div>
 
                             <div class="form-group">
                                 <label for="website">Website address</label>
-                                <input type="text" class="form-control" id="website" name="website" placeholder="Enter website address" value="{!! old('website', isset($company)?$company->website:'') !!}">
+                                <input type="text" class="form-control" id="website" name="website" placeholder="Enter website address" value="{!! old('website', isset($company) ? $company->website : '') !!}">
                             </div>
 
                             <div class="form-group">

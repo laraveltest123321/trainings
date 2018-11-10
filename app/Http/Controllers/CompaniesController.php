@@ -18,6 +18,7 @@ class CompaniesController extends Controller
         $companies = Company::paginate(10);
         return view('companies.index', compact('companies'));
     }
+
      /**
      * Show the form for creating a new resource.
      *
@@ -27,6 +28,7 @@ class CompaniesController extends Controller
     {
         return view('companies.form');
     }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -45,6 +47,7 @@ class CompaniesController extends Controller
         Company::create($data);
         return redirect()->route('companies.index')->with('success', 'Company was successfully created.');
     }
+
     /**
      * Show the form for editing the specified resource.
      *
@@ -56,6 +59,7 @@ class CompaniesController extends Controller
         $company = Company::findOrFail($id);
         return view('companies.form', compact('company'));
     }
+
     /**
      * Update the specified resource in storage.
      *
@@ -83,6 +87,7 @@ class CompaniesController extends Controller
         $company->update($data);
         return redirect()->route('companies.index')->with('success', 'Company was successfully updated.');
     }
+
     /**
      * Remove the specified resource from storage.
      *

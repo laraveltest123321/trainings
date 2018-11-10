@@ -18,6 +18,7 @@ class EmployeesController extends Controller
         $employees = Employee::with('company')->paginate(10);
         return view('employees.index', compact('employees'));
     }
+
        /**
      * Show the form for creating a new resource.
      *
@@ -28,6 +29,7 @@ class EmployeesController extends Controller
         $companies = Company::all();
         return view('employees.form', compact('companies'));
     }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -40,6 +42,7 @@ class EmployeesController extends Controller
         Employee::create($data);
         return redirect()->route('employees.index')->with('success', 'Employee was successfully created.');
     }
+
     /**
      * Show the form for editing the specified resource.
      *
@@ -53,6 +56,7 @@ class EmployeesController extends Controller
         $employee = Employee::findOrFail($id);
         return view('employees.form', compact('companies', 'employees', 'employee'));
     }
+
     /**
      * Update the specified resource in storage.
      *
@@ -66,6 +70,7 @@ class EmployeesController extends Controller
         Employee::where('id', $id)->update($data);
         return redirect()->route('employees.index')->with('success', 'Employee was successfully updated.');
     }
+
     /**
      * Remove the specified resource from storage.
      *
