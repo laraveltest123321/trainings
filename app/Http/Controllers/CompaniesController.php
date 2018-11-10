@@ -16,10 +16,8 @@ class CompaniesController extends Controller
     public function index()
     {
         $companies = Company::paginate(10);
-
         return view('companies.index', compact('companies'));
     }
-
      /**
      * Show the form for creating a new resource.
      *
@@ -29,8 +27,6 @@ class CompaniesController extends Controller
     {
         return view('companies.form');
     }
-
-
     /**
      * Store a newly created resource in storage.
      *
@@ -47,10 +43,8 @@ class CompaniesController extends Controller
             $data['logo'] = $imagename;
         }
         Company::create($data);
-
         return redirect()->route('companies.index')->with('success', 'Company was successfully created.');
     }
-
     /**
      * Show the form for editing the specified resource.
      *
@@ -60,11 +54,8 @@ class CompaniesController extends Controller
     public function edit($id)
     {
         $company = Company::findOrFail($id);
-
         return view('companies.form', compact('company'));
-
     }
-
     /**
      * Update the specified resource in storage.
      *
@@ -76,9 +67,7 @@ class CompaniesController extends Controller
     {
         $company = Company::findOrFail($id);
         $data = $request->only(['name', 'email', 'website']);
-
         $image = $request->file('logo');
-
         if ($image) {
             if($company->logo) {
                 $logo_path = public_path("/storage/".$company->logo);
@@ -92,10 +81,8 @@ class CompaniesController extends Controller
             $data['logo'] = $imagename;
         }
         $company->update($data);
-
         return redirect()->route('companies.index')->with('success', 'Company was successfully updated.');
     }
-
     /**
      * Remove the specified resource from storage.
      *
@@ -110,7 +97,6 @@ class CompaniesController extends Controller
             File::delete($logoPath);
         }
         $company->delete();
-
         return redirect()->route('companies.index')->with('success', 'Company was successfully deleted.');
     }
 }
