@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\EmployeeRequest;
+use App\Services\EmployeeService;
+use App\Services\CompanyService;
 use App\Models\Employee;
-use App\Models\Company;
 
 class EmployeesController extends Controller
 {
@@ -24,9 +25,9 @@ class EmployeesController extends Controller
      *
      * @return Response
      */
-    public function create()
+    public function create(CompanyService $companyService)
     {
-        $companies = Company::all();
+        $companies = $companyService->getAll();
         return view('employees.form', compact('companies'));
     }
 
@@ -49,11 +50,11 @@ class EmployeesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(EmployeeService $employeeService, CompanyService $companyService, $id)
     {
-        $companies = Company::all();
+        $companies = $companyService->getAll();
         $employees = Employee::where('id', '!=', $id)->paginate(10);
-        $employee = Employee::findOrFail($id);
+        $employee = $employeeService->getById($id);
         return view('employees.form', compact('companies', 'employees', 'employee'));
     }
 
@@ -64,10 +65,10 @@ class EmployeesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(EmployeeRequest $request, $id)
+    public function update(EmployeeRequest $request, EmployeeService $employeeService, $id)
     {
         $data = $request->only(['company_id', 'first_name', 'last_name', 'email', 'phone']);
-        Employee::where('id', $id)->update($data);
+        $employeeService->getById($id)->update($data);
         return redirect()->route('employees.index')->with('success', 'Employee was successfully updated.');
     }
 
@@ -77,10 +78,9 @@ class EmployeesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(EmployeeService $employeeService, $id)
     {
-        $employee = Employee::findOrFail($id);
-        $employee->delete();
+        $employeeService->getById($id)->delete();
         return redirect()->route('employees.index')->with('success', 'Employee was successfully deleted.');
     }
 }

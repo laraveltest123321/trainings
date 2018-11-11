@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CompanyRequest;
+use App\Services\CompanyService;
 use App\Models\Company;
 use File;
 
@@ -54,9 +55,9 @@ class CompaniesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(CompanyService $companyService, $id)
     {
-        $company = Company::findOrFail($id);
+        $company = $companyService->getById($id);
         return view('companies.form', compact('company'));
     }
 
@@ -67,9 +68,9 @@ class CompaniesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(CompanyRequest $request, $id)
+    public function update(CompanyRequest $request, CompanyService $companyService, $id)
     {
-        $company = Company::findOrFail($id);
+        $company = $companyService->getById($id);
         $data = $request->only(['name', 'email', 'website']);
         $image = $request->file('logo');
         if ($image) {
@@ -94,9 +95,9 @@ class CompaniesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(CompanyService $companyService, $id)
     {
-        $company = Company::findOrFail($id);
+        $company = $companyService->getById($id);
         $logoPath = public_path("/storage/".$company->logo);
         if(File::exists($logoPath)) {
             File::delete($logoPath);
