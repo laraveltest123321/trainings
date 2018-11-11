@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\EmployeeRequest;
 use App\Services\EmployeeService;
 use App\Services\CompanyService;
-use App\Models\Employee;
 
 class EmployeesController extends Controller
 {
@@ -14,9 +13,10 @@ class EmployeesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(EmployeeService $employeeService)
     {
-        $employees = Employee::with('company')->paginate(10);
+        $employees = $employeeService->getAll(true, 10);
+        $employees->load('company');
         return view('employees.index', compact('employees'));
     }
 
@@ -27,7 +27,7 @@ class EmployeesController extends Controller
      */
     public function create(CompanyService $companyService)
     {
-        $companies = $companyService->getAll();
+        $companies = $companyService->getAll(false);
         return view('employees.form', compact('companies'));
     }
 
@@ -37,10 +37,10 @@ class EmployeesController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(EmployeeRequest $request)
+    public function store(EmployeeRequest $request, EmployeeService $employeeService)
     {
         $data = $request->only(['company_id', 'first_name', 'last_name', 'email', 'phone']);
-        Employee::create($data);
+        $employeeService->create($data);
         return redirect()->route('employees.index')->with('success', 'Employee was successfully created.');
     }
 
@@ -52,8 +52,7 @@ class EmployeesController extends Controller
      */
     public function edit(EmployeeService $employeeService, CompanyService $companyService, $id)
     {
-        $companies = $companyService->getAll();
-        $employees = Employee::where('id', '!=', $id)->paginate(10);
+        $companies = $companyService->getAll(false);
         $employee = $employeeService->getById($id);
         return view('employees.form', compact('companies', 'employees', 'employee'));
     }

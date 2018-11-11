@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CompanyRequest;
 use App\Services\CompanyService;
-use App\Models\Company;
 use File;
 
 class CompaniesController extends Controller
@@ -14,9 +13,9 @@ class CompaniesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(CompanyService $companyService)
     {
-        $companies = Company::paginate(10);
+        $companies = $companyService->getAll(true, 10);
         return view('companies.index', compact('companies'));
     }
 
@@ -36,7 +35,7 @@ class CompaniesController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(CompanyRequest $request)
+    public function store(CompanyRequest $request, CompanyService $companyService)
     {
         $data = $request->only(['name', 'email', 'website']);
         if ($image = $request->file('logo')) {
@@ -45,7 +44,7 @@ class CompaniesController extends Controller
             $image->move($destinationPath, $imagename);
             $data['logo'] = $imagename;
         }
-        Company::create($data);
+        $companyService->create($data);
         return redirect()->route('companies.index')->with('success', 'Company was successfully created.');
     }
 
