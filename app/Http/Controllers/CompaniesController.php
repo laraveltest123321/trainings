@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CompanyRequest;
 use App\Services\CompanyService;
-use File;
 
 class CompaniesController extends Controller
 {
@@ -38,13 +37,7 @@ class CompaniesController extends Controller
     public function store(CompanyRequest $request, CompanyService $companyService)
     {
         $data = $request->only(['name', 'email', 'website']);
-        if ($image = $request->file('logo')) {
-            $imagename = time().'.'.$image->getClientOriginalExtension();
-            $destinationPath = storage_path('/app/public');
-            $image->move($destinationPath, $imagename);
-            $data['logo'] = $imagename;
-        }
-        $companyService->create($data);
+        $companyService->store($data, $request->file('logo'));
         return redirect()->route('companies.index')->with('success', 'Company was successfully created.');
     }
 
@@ -69,22 +62,8 @@ class CompaniesController extends Controller
      */
     public function update(CompanyRequest $request, CompanyService $companyService, $id)
     {
-        $company = $companyService->getById($id);
         $data = $request->only(['name', 'email', 'website']);
-        $image = $request->file('logo');
-        if ($image) {
-            if($company->logo) {
-                $logo_path = public_path("/storage/".$company->logo);
-                if(File::exists($logo_path)) {
-                    File::delete($logo_path);
-                }
-            }
-            $imagename = time().'.'.$image->getClientOriginalExtension();
-            $destinationPath = storage_path('/app/public');
-            $image->move($destinationPath, $imagename);
-            $data['logo'] = $imagename;
-        }
-        $company->update($data);
+        $companyService->update($id, $data, $request->file('logo'));
         return redirect()->route('companies.index')->with('success', 'Company was successfully updated.');
     }
 
@@ -96,12 +75,7 @@ class CompaniesController extends Controller
      */
     public function destroy(CompanyService $companyService, $id)
     {
-        $company = $companyService->getById($id);
-        $logoPath = public_path("/storage/".$company->logo);
-        if(File::exists($logoPath)) {
-            File::delete($logoPath);
-        }
-        $company->delete();
+        $companyService->destroy($id);
         return redirect()->route('companies.index')->with('success', 'Company was successfully deleted.');
     }
 }

@@ -37,8 +37,36 @@ class EmployeeService
      *
      * @return App\Models\Employee
      */
-    public function create($data)
+    public function store($data)
     {
         return Employee::create($data);
+    }
+
+
+    /**
+     * Update existing employee.
+     *
+     * @param int $id
+     * @param array $data.
+     *
+     * @return boolean
+     */
+    public function update($id, $data)
+    {
+        $employee = $this->getById($id);
+        return $employee->update($data);
+    }
+
+    /**
+     * Destroy existing employee.
+     *
+     * @param int $id
+     *
+     * @return boolean
+     */
+    public function destroy($id)
+    {
+        $employee = $this->getById($id);
+        return $employee->delete();
     }
 }

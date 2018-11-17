@@ -40,7 +40,7 @@ class EmployeesController extends Controller
     public function store(EmployeeRequest $request, EmployeeService $employeeService)
     {
         $data = $request->only(['company_id', 'first_name', 'last_name', 'email', 'phone']);
-        $employeeService->create($data);
+        $employeeService->store($data);
         return redirect()->route('employees.index')->with('success', 'Employee was successfully created.');
     }
 
@@ -67,7 +67,7 @@ class EmployeesController extends Controller
     public function update(EmployeeRequest $request, EmployeeService $employeeService, $id)
     {
         $data = $request->only(['company_id', 'first_name', 'last_name', 'email', 'phone']);
-        $employeeService->getById($id)->update($data);
+        $employeeService->update($id, $data);
         return redirect()->route('employees.index')->with('success', 'Employee was successfully updated.');
     }
 
@@ -79,7 +79,7 @@ class EmployeesController extends Controller
      */
     public function destroy(EmployeeService $employeeService, $id)
     {
-        $employeeService->getById($id)->delete();
+        $employeeService->destroy($id);
         return redirect()->route('employees.index')->with('success', 'Employee was successfully deleted.');
     }
 }

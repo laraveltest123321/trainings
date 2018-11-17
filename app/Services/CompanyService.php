@@ -2,6 +2,7 @@
 namespace App\Services;
 
 use App\Models\Company;
+use File;
 
 class CompanyService
 {
@@ -34,11 +35,63 @@ class CompanyService
      * Create new company.
      *
      * @param array $data.
+     * @param nullable file @img.
      *
      * @return App\Models\Company
      */
-    public function create($data)
+    public function store($data, $img = null)
     {
+        if ($img) {
+            $imagename = time().'.'.$img->getClientOriginalExtension();
+        $destinationPath = storage_path('/app/public');
+        $img->move($destinationPath, $imagename);
+        $data['logo'] = $imagename;
+        }
         return Company::create($data);
+    }
+
+
+    /**
+     * Update existing company.
+     *
+     * @param int $id
+     * @param array $data.
+     * @param nullable file @img.
+     *
+     * @return boolean
+     */
+    public function update($id, $data, $img = null)
+    {
+        $company = $this->getById($id);
+        if ($img) {
+            if($company->logo) {
+                $logo_path = public_path("/storage/".$company->logo);
+                if(File::exists($logo_path)) {
+                    File::delete($logo_path);
+                }
+            }
+            $imagename = time().'.'.$img->getClientOriginalExtension();
+            $destinationPath = storage_path('/app/public');
+            $img->move($destinationPath, $imagename);
+            $data['logo'] = $imagename;
+        }
+        return $company->update($data);
+    }
+
+    /**
+     * Destroy existing company.
+     *
+     * @param int $id
+     *
+     * @return boolean
+     */
+    public function destroy($id)
+    {
+        $company = $this->getById($id);
+        $logoPath = public_path("/storage/".$company->logo);
+        if(File::exists($logoPath)) {
+            File::delete($logoPath);
+        }
+        return $company->delete();
     }
 }
