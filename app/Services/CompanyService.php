@@ -43,9 +43,9 @@ class CompanyService
     {
         if ($img) {
             $imagename = time().'.'.$img->getClientOriginalExtension();
-        $destinationPath = storage_path('/app/public');
-        $img->move($destinationPath, $imagename);
-        $data['logo'] = $imagename;
+            $destinationPath = storage_path('/app/public');
+            $img->move($destinationPath, $imagename);
+            $data['logo'] = $imagename;
         }
         return Company::create($data);
     }
@@ -65,9 +65,9 @@ class CompanyService
         $company = $this->getById($id);
         if ($img) {
             if($company->logo) {
-                $logo_path = public_path("/storage/".$company->logo);
-                if(File::exists($logo_path)) {
-                    File::delete($logo_path);
+                $logoPath = storage_path("/storage/".$company->logo);
+                if(File::exists($logoPath)) {
+                    File::delete($logoPath);
                 }
             }
             $imagename = time().'.'.$img->getClientOriginalExtension();
@@ -75,7 +75,10 @@ class CompanyService
             $img->move($destinationPath, $imagename);
             $data['logo'] = $imagename;
         }
-        return $company->update($data);
+        if ($company) {
+            return $company->update($data);
+        }
+        return false;
     }
 
     /**
@@ -88,10 +91,13 @@ class CompanyService
     public function destroy($id)
     {
         $company = $this->getById($id);
-        $logoPath = public_path("/storage/".$company->logo);
+        $logoPath = storage_path("/storage/".$company->logo);
         if(File::exists($logoPath)) {
             File::delete($logoPath);
         }
-        return $company->delete();
+        if ($company) {
+            return $company->delete();
+        }
+        return false;
     }
 }

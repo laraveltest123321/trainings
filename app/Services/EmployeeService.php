@@ -54,7 +54,10 @@ class EmployeeService
     public function update($id, $data)
     {
         $employee = $this->getById($id);
-        return $employee->update($data);
+        if ($employee) {
+            return $employee->update($data);
+        }
+        return false;
     }
 
     /**
@@ -67,6 +70,9 @@ class EmployeeService
     public function destroy($id)
     {
         $employee = $this->getById($id);
-        return $employee->delete();
+        if ($employee) {
+            return $employee->delete();
+        }
+        return false;
     }
 }
